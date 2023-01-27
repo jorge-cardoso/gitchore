@@ -75,7 +75,7 @@ def url():
         project_url = request.form['project_url']
 
         try:
-            requests.head(project_url)
+            requests.head(project_url, verify=False)
         except ValueError:
             return f'Project url is not valid: {project_url}'
 
