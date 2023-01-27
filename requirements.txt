@@ -6,7 +6,7 @@ marko
 mistletoe
 bs4
 html-to-json
-werkzeug<2.2
-flask== 2.1.1
-flask-restx==0.5.1
-Flask-SQLAlchemy== 2.5.1
+werkzeug
+flask
+flask-restx
+Flask-SQLAlchemy
