@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="my-4">Registered Projects</h1>
+  {% if urls|length < 1 %}
+  <p>No url registered.</p>
+  {% else %}
+  <form action="/url/update" method="GET">
+    <div class="form-row">
+      <div class="col-sm-2 my-1">
+        <button type="submit" class="btn btn-primary btn-block">Update all</button>
+      </div>
+    </div>
+  </form>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Url</th>
+        <th>Project name</th>
+        <th>Id</th>
+        <th>Updated</th>
+        <th>Added</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for url in urls %}
+      <tr>
+        <td><a href="{{ url_for('routes.update', url_id=url.id) }}">{{ url.url }}</a></td>
+        <td>{{ url.name }}</td>
+        <td>{{ url.id }}</td>
+        <td>{{ url.created_at.date() }}</td>
+        <td>{{ url.created_at.date() }}</td>
+        <td class="text-right"><a class="btn btn-danger btn-sm" href="{{ url_for('routes.delete', url_id=url.id) }}" role="button">Delete</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% include 'snippets/form.html' %}
+</div>
+{% endblock content %}
