@@ -51,7 +51,7 @@ def index():
 
 
 def download_remote_project(project_url):
-    req = requests.get(project_url, allow_redirects=True)
+    req = requests.get(project_url, allow_redirects=True, verify=False)
     print(req.content)
     return req.content
 
