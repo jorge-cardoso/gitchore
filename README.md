@@ -1,3 +1,10 @@
+# Next Steps
++ Write full project description example
++ Implement schema on the client side
++ Test if md files can be retrieved from other CVS
++ Add logging 
++ Write unittests
+
 # Gitchore - Git-based Project Management
 
 Gitchore collects project management descriptions from git repos via HTTP endpoints.
