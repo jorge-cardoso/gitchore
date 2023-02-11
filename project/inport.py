@@ -1,9 +1,9 @@
-import json
+from project.parser import Parser
 
-from conversion.parser import Parser
+PROJECT_KEYS = ['Overview', 'Description', 'Tasks', 'Sprints', 'Results']
 
 
-class Project:
+class Inport:
     def __init__(self, content=None, filename=None):
         self.parser = Parser(content=content, filename=filename)
 
@@ -20,7 +20,7 @@ class Project:
         return self.parser.get_html()
 
     def name(self):
-        return self.overview()['Project name"']
+        return self.overview()['Project name']
 
     def overview(self):
         d = dict()
@@ -66,18 +66,3 @@ class Project:
         else:
             d['Results'] = self.parser.get_key_values(section[-1])
         return d
-
-
-if __name__ == '__main__':
-    p = Project(filename='samples/ultra_scale_aiops.md')
-
-    project = p.get_html()
-    print(json.dumps(project, indent=2))
-    with open('samples/ultra_scale_aiops.html', 'w') as f:
-        f.write(project)
-
-    project = p.get_dict()
-    print(json.dumps(project, indent=2))
-    with open('samples/ultra_scale_aiops.json', 'w') as f:
-        json.dump(project, f)
-

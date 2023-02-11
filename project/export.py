@@ -2,7 +2,7 @@ import re
 import json
 import pandas as pd
 
-from conversion.project import Project
+from project.project import Project
 
 
 class ExportProject:

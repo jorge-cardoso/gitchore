@@ -7,6 +7,6 @@ mistletoe
 bs4
 html-to-json
 werkzeug
-flask
+flask>=2.2.2
 flask-restx
 Flask-SQLAlchemy

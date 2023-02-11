@@ -1,2 +1,2 @@
-SAMPLE_DATA_DIR = 'samples'
+SAMPLE_DATA_DIR = 'test/files'
 CACHE_DIR = 'cache'
