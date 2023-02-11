@@ -10,3 +10,4 @@ werkzeug
 flask>=2.2.2
 flask-restx
 Flask-SQLAlchemy
+concurrent-log-handler

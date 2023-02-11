@@ -3,6 +3,7 @@ import re
 import unicodedata
 import json
 from datetime import datetime
+import logging
 
 from urllib.parse import urlparse
 import requests
@@ -13,6 +14,8 @@ from config import CACHE_DIR
 
 from project.project import Project
 from project.download import Downloader
+
+logger = logging.getLogger(__name__)
 
 frontend_blueprint = Blueprint('routes', __name__)
 
@@ -46,9 +49,9 @@ def existing_projects():
     return {'data': []}
 
 
-@frontend_blueprint.route('/')
-def index():
-    return redirect('/url')
+# @frontend_blueprint.route('/')
+# def index():
+#     return redirect('/url')
 
 
 # def download_remote_project(project_url):
@@ -76,8 +79,9 @@ def convert_to_project(content):
 #     return filename
 
 
+@frontend_blueprint.route('/', methods=['GET', 'POST'])
 @frontend_blueprint.route('/url', methods=['GET', 'POST'])
-def url():
+def index():
     if request.method == 'POST':
         project_url = request.form['project_url']
 

@@ -40,4 +40,3 @@ class Url(db.Model):
 
     def __repr__(self):
         return '<Url %r>' % self.url
-

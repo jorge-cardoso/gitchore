@@ -35,8 +35,8 @@ You can use PM Flavored Markdown for:
 **Clone Repo**
 
 ```bash
-$ git clone https://github.com/jorge-cardoso/pm_as_code.git
-$ cd pm_as_code
+$ git clone https://github.com/jorge-cardoso/gitchore
+$ cd gitchore
 ```
 
 **Install Modules** using a Virtual Environment
@@ -44,14 +44,17 @@ $ cd pm_as_code
 ```bash
 $ virtualenv env
 $ source env/bin/activate
-$ pip3 install -r requirements.txt
+$ pip3 install -r pip-requirements.txt
 ```
 
 **Set up the environment**
 
+FLASK_DEBUG enables hot reloading. 
+
 ```bash
 $ export FLASK_APP=run.py
-$ export FLASK_DEBUG=1
+$ export FLASK_ENV=development
+$ export FLASK_DEBUG=1  
 ```
 
 **Sample Data**
@@ -62,5 +65,5 @@ $ export FLASK_DEBUG=1
 **Start the application**
 
 ```bash
-$ flask run 
+$  flask run --host=0.0.0.0 --port=8011
 ```

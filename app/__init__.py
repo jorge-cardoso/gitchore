@@ -6,11 +6,22 @@ from app.api import api_blueprint
 from app.routes import frontend_blueprint
 from app.loader import data_importer, data_importer_json
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.register_blueprint(frontend_blueprint)
-app.register_blueprint(api_blueprint, url_prefix='/api')
+from app.setup import setup_logging
+
+
+def create_app():
+    setup_logging(None)
+
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.register_blueprint(frontend_blueprint)
+    app.register_blueprint(api_blueprint, url_prefix='/api')
+
+    return app
+
+
+app = create_app()
 
 
 @app.cli.command('load-data')

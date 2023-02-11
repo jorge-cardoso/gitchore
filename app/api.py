@@ -72,4 +72,3 @@ class ProjectAPI(Resource):
         db.session.add(row)
         db.session.commit()
         return {'status': 'success'}
-
