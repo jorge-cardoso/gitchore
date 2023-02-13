@@ -11,7 +11,6 @@ class ExportProject:
 
     def dump(self, project):
         name, _ = os.path.splitext(self.filename)
-        print(f'Saving file to: {name}')
         # project = self.create()
         with open(f'{name}.json', 'w', encoding='utf-8') as f:
             json.dump(project, f, ensure_ascii=False, indent=4)

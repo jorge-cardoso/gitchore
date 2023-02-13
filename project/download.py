@@ -3,13 +3,10 @@ import logging
 import re
 import unicodedata
 import json
-import tempfile
-import shutil
 
 import requests
-import werkzeug
 
-from config import CACHE_DIR
+from project import project
 
 logger = logging.getLogger(__name__)
 
@@ -36,45 +33,6 @@ def slugify(value, allow_unicode=False):
     return re.sub(r"[-\s]+", "-", value).strip("-_")
 
 
-def download_file(url, folder, filename):
-    """Downloads a file from the internet, but only if it doesn't already exist on disk.
-
-    Parameters
-    ----------
-    url : str
-      The URL to download.
-    folder : list or tuple
-      The folder where to store the file, as list.
-      For example, use [".", "files", "model"] instead of "./files/model/".
-    filename : str
-      The name of the file on disk.
-
-    Example
-    -------
-
-    >>> download_file(
-    ...     'https://upload.wikimedia.org/wikipedia/commons/0/0e/Tree_example_VIS.jpg',
-    ...     ('.', 'foo', 'bar'),
-    ...     'example.jpg')
-
-    """
-    full_filepath = os.path.abspath(os.path.expanduser(os.path.expandvars(
-        os.path.join(*tuple(folder)))))
-
-    full_filename = os.path.join(full_filepath, filename)
-
-    if os.path.isfile(full_filename):
-        return
-
-    os.makedirs(full_filepath, exist_ok=True)
-
-    resp = requests.get(url, stream=True)
-
-    with open(full_filename, 'wb') as file_desc:
-        for chunk in resp.iter_content(chunk_size=5000000):
-            file_desc.write(chunk)
-
-
 def size_fmt(n_bytes):
     for symbol in ['B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB']:
         if n_bytes < 1024.0:
@@ -86,23 +44,14 @@ def size_fmt(n_bytes):
 
 
 class Downloader:
-    def __init__(self, url):
+    """Downloads a file from the internet."""
+    def __init__(self, url, local_dir):
         self.url = url
-        self.tmp = None
+        self.local_dir = local_dir
+        self.content = None
+        self.project = {}
 
-    def get_content(self):
-        req = requests.get(self.url, allow_redirects=True, verify=False)
-        print(req.content)
-        return req.content
-
-    def save_project(self, project_name, d):
-        filename = os.path.join(CACHE_DIR, slugify(project_name) + '.json')
-        print(f'Saving project to file: {filename}')
-        with open(filename, 'w') as f:
-            json.dump(d, f)
-        return filename
-
-    def validate_url(self) -> dict:
+    def is_url_valid(self) -> dict:
         try:
             resp = requests.head(self.url, allow_redirects=True, verify=False)
             return {
@@ -112,35 +61,37 @@ class Downloader:
         except ValueError:
             return {}
 
-    def save_tmp(self):
-        self.tmp = tempfile.NamedTemporaryFile()
-        logging.debug('Creating temporary file: %s', self.tmp.name)
-        self.get_file_chunks(self.tmp.name)
-        return self.tmp.name
+    def get_content(self):
+        req = requests.get(self.url, allow_redirects=True, verify=False)
+        self.content = req.content
+        return self.content
 
-    def get_file_chunks(self, file_name: str = None):
-        logging.debug('Getting remote file: %s', file_name)
+    def get_project(self):
+        if not self.content:
+            self.get_content()
 
-        response = requests.get(self.url, stream=True, allow_redirects=True, verify=False)
+        proj = project.Project(content=self.content.decode())
+        self.project = proj.get_dict()
+        return self.project
 
-        with open(file_name, 'wb') as file_desc:
-            logging.debug('Saving remote file to: %s', file_name)
-            for chunk in response.iter_content(chunk_size=5000000):
-                file_desc.write(chunk)
+    def project_name(self):
+        if not self.project:
+            self.get_project()
+        return self.project['Overview']['Project name'][0]
 
-    def delete_tmp(self):
-        if not self.tmp:
-            print('No tmp file exists')
-            return
-        self.tmp.close()
-        self.tmp = None
+    def save(self):
+        md_file = os.path.join(self.local_dir, slugify(self.project_name()) + '.md')
+        json_file = os.path.join(self.local_dir, slugify(self.project_name()) + '.json')
+        self.save_content(md_file)
+        self.save_project(json_file)
+        return [md_file, json_file]
 
-    def mv(self, src_filename: str = None, dst_filename: str = None):
-        if not self.tmp:
-            print('No tmp file exists')
-            return
+    def save_content(self, file_name: str = None):
+        logging.debug(f'Saving content to file: {file_name}')
+        with open(file_name, 'w') as f:
+            f.write(self.content.decode())
 
-        print("Copy tmp file to: %s", dst_filename)
-        shutil.copyfile(src_filename, dst_filename)
-        self.tmp.close()
-        self.tmp = None
+    def save_project(self, file_name):
+        logging.debug(f'Saving project to file: {file_name}')
+        with open(file_name, 'w') as f:
+            json.dump(self.project, f)

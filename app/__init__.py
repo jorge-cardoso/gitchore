@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 
+from config import DB_DIR
 from app.models import db, Project, Description
 from app.api import api_blueprint
 from app.routes import frontend_blueprint

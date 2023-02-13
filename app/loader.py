@@ -1,12 +1,15 @@
+import logging
 import os
 import json
 from csv import DictReader
 import click
 import sqlalchemy
 
+logger = logging.getLogger(__name__)
+
 
 def data_importer(db, DataModel, file_path):
-    print(f'Loading file: {os.getcwd()}, {file_path}')
+    logger.debug('Loading file: %s, %s', os.getcwd(), file_path)
 
     try:
         with open(file_path) as fp:

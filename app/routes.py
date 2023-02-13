@@ -1,35 +1,15 @@
-import os
-import re
-import unicodedata
-import json
-from datetime import datetime
 import logging
+from datetime import datetime
+from flask import Blueprint, render_template, redirect, request
 
-from urllib.parse import urlparse
-import requests
-from flask import Blueprint, render_template, redirect, url_for, request
-
-from app.models import db, Url
 from config import CACHE_DIR
+from app.models import db, Url
 
-from project.project import Project
 from project.download import Downloader
 
 logger = logging.getLogger(__name__)
 
 frontend_blueprint = Blueprint('routes', __name__)
-
-
-def existing_projects():
-    response = requests.get('http://127.0.0.1:5000/api/project', verify=False)
-    if response.status_code == 200 and 'application/json' in response.headers.get('Content-Type', ''):
-        return response.json()['data']
-    return {'data': []}
-
-
-def convert_to_project(content):
-    project = Project(content=content.decode())
-    return project.get_dict()
 
 
 @frontend_blueprint.route('/', methods=['GET', 'POST'])
@@ -38,34 +18,27 @@ def index():
     if request.method == 'POST':
         project_url = request.form['project_url']
 
-        downloader = Downloader(project_url)
+        downloader = Downloader(project_url, CACHE_DIR)
 
-        if not downloader.validate_url():
+        if not downloader.is_url_valid():
             logging.warning('Invalid project url: %s', project_url)
             return f'Project url is not valid: {project_url}'
 
-        tmp_filename = downloader.save_tmp()
-        # project = Project().load_from_file(tmp_filename)
-        # project.name
-        content = downloader.get_content()
-        project_dict = convert_to_project(content)
-        project_name = project_dict['Overview']['Project name'][0]
+        project_name = downloader.project_name()
 
-        exists = Url.query.filter_by(name=project_name).first() is not None
-        if exists:
-            downloader.delete_tmp()
+        if Url.query.filter_by(name=project_name).first() is not None:
+            logging.warning('Project name already exists: %s', project_name)
             return f'Project name already exists: {project_name}'
 
         try:
-            project_file = downloader.mv(tmp_filename, project_name)
-            # project_file = downloader.save_project(project_name, project_dict)
-            new_url = Url(url=project_url, name=project_name, file=project_file)
+            project_files = downloader.save()
+            new_url = Url(url=project_url, name=project_name, file=project_files[1])
             db.session.add(new_url)
             db.session.commit()
             return redirect('/url')
         except Exception:
-            os.remove(project_file)
-            return f"There was a problem adding new url: {project_url}. File removed: {project_file}"
+            logging.warning('Unable to add new url: %s', project_url)
+            return f'Unable to add new url: {project_url}'
 
     else:
         urls = Url.query.order_by(Url.created_at).all()
@@ -88,41 +61,48 @@ def show(url_id):
 def update_all():
     projects = Url.query.all()
     for project in projects:
-        content = download_remote_project(project.url)
-        project_dict = convert_to_project(content)
-        project_name = project_dict['Overview']['Project name']
-        if project_name != project.name:
-            print("Name of project has changed. Ignoring.")
+
+        downloader = Downloader(project.url, CACHE_DIR)
+
+        if not downloader.is_url_valid():
+            logging.warning('Invalid project url: %s', project.url)
+            return f'Project url is not valid: {project.url}'
+
+        if downloader.project_name() != project.name:
+            logging.warning('Name of project has changed. Ignoring: %s', project.url)
             continue
 
         try:
-            project_file = save_project_to_file(project_name, project_dict)
+            downloader.save()
             p = Url.query.filter_by(url=project.url).first()
             p.updated_at = datetime.utcnow()
             db.session.commit()
+
+            logging.debug('Project url updated: %s', project.url)
+
             return redirect('/url')
         except Exception as e:
-            return f"There was a problem deleting data: {e}"
+            return f'There was a problem deleting data: {e}'
 
-    return "Updated"
+    return 'Updated'
 
 
 @frontend_blueprint.route('/url/update/<int:url_id>', methods=['GET', 'POST'])
 def update(url_id):
     url = Url.query.get_or_404(url_id)
-    print('Update', url)
 
     if request.method == 'POST':
         url.url = request.form['name']
-        print('Post', url.url)
+        logger.debug('Updating: %s', url.url)
 
         try:
             db.session.commit()
             return redirect('/url')
         except:
-            return "There was a problem updating data."
+            return 'Unable to update project url.', 404
 
     else:
+        logger.debug('Fetching: %s', url)
         title = "Update Data"
         return render_template('update.html',
                                projects_id=['2'],
@@ -133,12 +113,12 @@ def update(url_id):
 
 @frontend_blueprint.route('/url/delete/<int:url_id>')
 def delete(url_id):
-    url = Url.query.get_or_404(url_id)
-    print('Delete', url)
-
+    logger.debug('Deleting url_id: %s', url_id)
     try:
+        url = Url.query.get_or_404(url_id)
         db.session.delete(url)
         db.session.commit()
         return redirect('/url')
     except:
-        return "There was a problem deleting data."
+        logger.warning('Unable to delete url_id: %s', url_id)
+        return f'Unable to delete url_id: {url_id}', 404

@@ -16,8 +16,8 @@ class Project(db.Model):
     completion = db.Column(db.Float)
     risk = db.Column(db.String(50), nullable=False, unique=False)
 
-    # def __repr__(self):
-    #     return f'{self.id : self.id}'
+    def __repr__(self):
+        return '<Project %r>' % self.name
 
 
 class Description(db.Model):
