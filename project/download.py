@@ -1,4 +1,5 @@
 import os
+import logging
 import re
 import unicodedata
 import json
@@ -9,6 +10,8 @@ import requests
 import werkzeug
 
 from config import CACHE_DIR
+
+logger = logging.getLogger(__name__)
 
 
 def slugify(value, allow_unicode=False):
@@ -33,6 +36,55 @@ def slugify(value, allow_unicode=False):
     return re.sub(r"[-\s]+", "-", value).strip("-_")
 
 
+def download_file(url, folder, filename):
+    """Downloads a file from the internet, but only if it doesn't already exist on disk.
+
+    Parameters
+    ----------
+    url : str
+      The URL to download.
+    folder : list or tuple
+      The folder where to store the file, as list.
+      For example, use [".", "files", "model"] instead of "./files/model/".
+    filename : str
+      The name of the file on disk.
+
+    Example
+    -------
+
+    >>> download_file(
+    ...     'https://upload.wikimedia.org/wikipedia/commons/0/0e/Tree_example_VIS.jpg',
+    ...     ('.', 'foo', 'bar'),
+    ...     'example.jpg')
+
+    """
+    full_filepath = os.path.abspath(os.path.expanduser(os.path.expandvars(
+        os.path.join(*tuple(folder)))))
+
+    full_filename = os.path.join(full_filepath, filename)
+
+    if os.path.isfile(full_filename):
+        return
+
+    os.makedirs(full_filepath, exist_ok=True)
+
+    resp = requests.get(url, stream=True)
+
+    with open(full_filename, 'wb') as file_desc:
+        for chunk in resp.iter_content(chunk_size=5000000):
+            file_desc.write(chunk)
+
+
+def size_fmt(n_bytes):
+    for symbol in ['B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB']:
+        if n_bytes < 1024.0:
+            return "{0:3.1f} {1}".format(n_bytes, symbol)
+        else:
+            n_bytes /= 1024.0
+    # Return Yottabytes if all else fails.
+    return "{0:3.1f} {1}".format(n_bytes, 'YB')
+
+
 class Downloader:
     def __init__(self, url):
         self.url = url
@@ -50,86 +102,31 @@ class Downloader:
             json.dump(d, f)
         return filename
 
-    def validate_url(self) -> bool:
+    def validate_url(self) -> dict:
         try:
-            requests.head(self.url, verify=False)
+            resp = requests.head(self.url, allow_redirects=True, verify=False)
+            return {
+                'Content-Length': resp.headers.get('Content-Length'),
+                'Content-Type': resp.headers.get('Content-Type')
+            }
         except ValueError:
-            return False
-        return True
-
-    def headers(self) -> dict:
-        response = requests.head(self.url)
-
-        filename = response.headers.get("Content-Disposition")
-        filesize = response.headers.get("Content-Length")
-        filetype = response.headers.get("Content-Type")
-
-        if filename:
-            parsed_headers = werkzeug.http.parse_options_header(filename)
-
-            for keys in parsed_headers:
-                if "filename" in keys:
-                    filename = keys["filename"]
-            return {"filename": filename, "filesize": filesize, "filetype": filetype}
-        else:
-            if filetype:
-                if "image" in filetype:
-                    if "jpeg" in filetype:
-                        return {
-                            "filename": "download.jpg",
-                            "filesize": filesize,
-                            "filetype": filetype,
-                        }
-                    if "gif" in filetype:
-                        return {
-                            "filename": "download.gif",
-                            "filesize": filesize,
-                            "filetype": filetype,
-                        }
-                    if "png" in filetype:
-                        return {
-                            "filename": "download.png",
-                            "filesize": filesize,
-                            "filetype": filetype,
-                        }
-                    if "webp" in filetype:
-                        return {
-                            "filename": "download.webp",
-                            "filesize": filesize,
-                            "filetype": filetype,
-                        }
-            else:
-                return {
-                    "filename": "download.html",
-                    "filesize": filesize,
-                    "filetype": filetype,
-                }
-
-    def get_file_chunks(self, file_name: str = None):
-        file_info = self.headers()
-        file_name = file_name or file_info["filename"]
-        response = requests.get(self.url, stream=True)
-
-        with open(file_name, "wb") as file:
-            if file_info["filesize"]:
-                size = int(file_info["filesize"])
-                current = 0
-                for chunk in response.iter_content(chunk_size=4096):
-                    current += len(chunk)
-                    downloaded = current / size * 100
-                    file.write(chunk)
-            else:
-                file.write(requests.get(self.url, stream=True).content)
-
-        return file_name
+            return {}
 
     def save_tmp(self):
-        print("Creating a named temporary file..")
         self.tmp = tempfile.NamedTemporaryFile()
-        print("Created file is:", self.tmp)
-        print("Name of the file is:", self.tmp.name)
+        logging.debug('Creating temporary file: %s', self.tmp.name)
         self.get_file_chunks(self.tmp.name)
         return self.tmp.name
+
+    def get_file_chunks(self, file_name: str = None):
+        logging.debug('Getting remote file: %s', file_name)
+
+        response = requests.get(self.url, stream=True, allow_redirects=True, verify=False)
+
+        with open(file_name, 'wb') as file_desc:
+            logging.debug('Saving remote file to: %s', file_name)
+            for chunk in response.iter_content(chunk_size=5000000):
+                file_desc.write(chunk)
 
     def delete_tmp(self):
         if not self.tmp:

@@ -20,28 +20,6 @@ logger = logging.getLogger(__name__)
 frontend_blueprint = Blueprint('routes', __name__)
 
 
-# def slugify(value, allow_unicode=False):
-#     """
-#     Function copied form Django text utils
-#
-#     Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
-#     dashes to single dashes. Remove characters that aren't alphanumerics,
-#     underscores, or hyphens. Convert to lowercase. Also strip leading and
-#     trailing whitespace, dashes, and underscores.
-#     """
-#     value = str(value)
-#     if allow_unicode:
-#         value = unicodedata.normalize("NFKC", value)
-#     else:
-#         value = (
-#             unicodedata.normalize("NFKD", value)
-#             .encode("ascii", "ignore")
-#             .decode("ascii")
-#         )
-#     value = re.sub(r"[^\w\s-]", "", value.lower())
-#     return re.sub(r"[-\s]+", "-", value).strip("-_")
-
-
 def existing_projects():
     response = requests.get('http://127.0.0.1:5000/api/project', verify=False)
     if response.status_code == 200 and 'application/json' in response.headers.get('Content-Type', ''):
@@ -49,34 +27,9 @@ def existing_projects():
     return {'data': []}
 
 
-# @frontend_blueprint.route('/')
-# def index():
-#     return redirect('/url')
-
-
-# def download_remote_project(project_url):
-#
-#     download = Downloader(url="DOWNLOAD LINK")
-#     headers = download.headers()
-#     is_downloadable = download.validate_url()
-#     download.save()
-#
-#     req = requests.get(project_url, allow_redirects=True, verify=False)
-#     print(req.content)
-#     return req.content
-
-
 def convert_to_project(content):
     project = Project(content=content.decode())
     return project.get_dict()
-
-
-# def save_project_to_file(project_name, d):
-#     filename = os.path.join(CACHE_DIR, slugify(project_name) + '.json')
-#     print(f'Saving project to file: {filename}')
-#     with open(filename, 'w') as f:
-#         json.dump(d, f)
-#     return filename
 
 
 @frontend_blueprint.route('/', methods=['GET', 'POST'])
@@ -88,6 +41,7 @@ def index():
         downloader = Downloader(project_url)
 
         if not downloader.validate_url():
+            logging.warning('Invalid project url: %s', project_url)
             return f'Project url is not valid: {project_url}'
 
         tmp_filename = downloader.save_tmp()
