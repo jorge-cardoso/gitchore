@@ -82,16 +82,22 @@ class Downloader:
     def save(self):
         md_file = os.path.join(self.local_dir, slugify(self.project_name()) + '.md')
         json_file = os.path.join(self.local_dir, slugify(self.project_name()) + '.json')
-        self.save_content(md_file)
-        self.save_project(json_file)
-        return [md_file, json_file]
 
-    def save_content(self, file_name: str = None):
+        if (self._save_helper(md_file, self.content.decode()) and
+                self._save_helper(json_file, json.dumps(self.project, indent=4))):
+            return [md_file, json_file]
+
+        return []
+
+    def _save_helper(self, file_name, content):
         logging.debug(f'Saving content to file: {file_name}')
-        with open(file_name, 'w') as f:
-            f.write(self.content.decode())
-
-    def save_project(self, file_name):
-        logging.debug(f'Saving project to file: {file_name}')
-        with open(file_name, 'w') as f:
-            json.dump(self.project, f)
+        try:
+            with open(file_name, 'w') as f:
+                try:
+                    f.write(content)
+                    return True
+                except (IOError, OSError):
+                    logging.debug('Error writing to file: %s', file_name)
+        except (FileNotFoundError, PermissionError, OSError):
+            logging.debug('Error opening file: %s', file_name)
+        return False

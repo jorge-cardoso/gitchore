@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from sqlalchemy import exc
 from flask import Blueprint, render_template, redirect, request
 
 from config import CACHE_DIR
@@ -32,11 +33,13 @@ def index():
 
         try:
             project_files = downloader.save()
+            if not project_files:
+                raise Exception('Unable to save files')
             new_url = Url(url=project_url, name=project_name, file=project_files[1])
             db.session.add(new_url)
             db.session.commit()
             return redirect('/url')
-        except Exception:
+        except (Exception, exc.SQLAlchemyError):
             logging.warning('Unable to add new url: %s', project_url)
             return f'Unable to add new url: {project_url}'
 
@@ -81,8 +84,8 @@ def update_all():
             logging.debug('Project url updated: %s', project.url)
 
             return redirect('/url')
-        except Exception as e:
-            return f'There was a problem deleting data: {e}'
+        except (Exception, exc.SQLAlchemyError) as e:
+            return f'Unable to delete data: {e}'
 
     return 'Updated'
 
@@ -98,7 +101,7 @@ def update(url_id):
         try:
             db.session.commit()
             return redirect('/url')
-        except:
+        except exc.SQLAlchemyError:
             return 'Unable to update project url.', 404
 
     else:
@@ -119,6 +122,6 @@ def delete(url_id):
         db.session.delete(url)
         db.session.commit()
         return redirect('/url')
-    except:
+    except exc.SQLAlchemyError:
         logger.warning('Unable to delete url_id: %s', url_id)
         return f'Unable to delete url_id: {url_id}', 404

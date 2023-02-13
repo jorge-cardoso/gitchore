@@ -10,13 +10,12 @@ logger = logging.getLogger(__name__)
 
 def data_importer(db, DataModel, file_path):
     logger.debug('Loading file: %s, %s', os.getcwd(), file_path)
-
     try:
         with open(file_path) as fp:
 
             rd = DictReader(fp)
             for cnt, row in enumerate(rd):
-                print(f'Importing: {row}')
+                logger.debug('Importing row: %s', row)
                 record = DataModel(**row)
                 db.session.add(record)
             db.session.commit()
@@ -30,14 +29,13 @@ def data_importer(db, DataModel, file_path):
 
 
 def data_importer_json(db, DataModel, file_path):
-    print(f'Loading file: {os.getcwd()}, {file_path}')
-
+    logger.debug('Loading file: %s, %s', os.getcwd(), file_path)
     try:
         with open(file_path) as fp:
 
             j = json.load(fp)
             description = j['Description']
-            print(f'Importing: {description}')
+            logger.debug('Importing description: %s', description)
 
             for k, v in description.items():
                 description[k] = ' '.join(v)

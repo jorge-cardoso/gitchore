@@ -1,3 +1,4 @@
+import logging
 import os
 import json
 import click
@@ -7,6 +8,8 @@ from app.models import db, Project, Url
 
 api_blueprint = Blueprint('api', __name__)
 api = Api(api_blueprint)
+
+logger = logging.getLogger(__name__)
 
 projects_model = api.model('Project', {
     'id': fields.String,
@@ -39,19 +42,20 @@ class UrlFileAPI(Resource):
 
     # @api.marshal_with(project_model, envelope='data')
     def get(self, url_id, **kwargs):
-
         project = Url.query.get(url_id)
+        if not project:
+            logger.info('Project url_id does not exist: %s', url_id)
+            return {}
+
         file = project.file
-        print(project, 'file:', project.file)
-        print(f'Loading file: {os.getcwd()}, {project.file}')
+        logger.debug('Loading file: %s', os.path.join(os.getcwd(), project.file))
 
         if not os.path.exists(file):
-            print(f'Project does not exist: {file}')
-            return
+            logger.debug('Project file does not exist: %s', file)
+            return {}
 
         with open(file) as fp:
-            j = json.load(fp)
-        return j
+            return json.load(fp)
 
 
 @api.route('/project/<string:project_name>')

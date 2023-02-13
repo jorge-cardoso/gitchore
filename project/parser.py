@@ -1,13 +1,9 @@
-import os
 from io import StringIO
-import pprint
 import re
-import json
 
 import mistletoe
 from bs4 import BeautifulSoup, Tag
 
-from config import CACHE_DIR, SAMPLE_DATA_DIR
 # https://extensions.xwiki.org/xwiki/bin/view/Extension/MarkdownSyntax/Markdown%20Syntax%201.2
 
 

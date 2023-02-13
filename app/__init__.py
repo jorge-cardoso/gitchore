@@ -14,7 +14,7 @@ def create_app():
     setup_logging(None)
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../instance/db.sqlite'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.register_blueprint(frontend_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api')
