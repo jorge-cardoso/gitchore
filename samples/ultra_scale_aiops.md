@@ -53,9 +53,7 @@
 + $12.01.2023, TDCP, final review
 
 
-# Execution
-
-## Tasks
+# Tasks
 
 + &Literature_Review: [&Research] Review literature of log management systems
 + &Competitor_analysis: [&Research] Analyse commercial log management systems
@@ -67,8 +65,8 @@
 + &Production: [&Production] Move system to CLS to production region
 + &Evaluation: [&Evaluation] Prepare final report
 
-## Sprints
-### $Jan 2023
+# Sprints
+## $Jan 2023
 
 + $23.01.2023
     + *Status*
