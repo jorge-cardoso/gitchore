@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 
+from app.config.reader import constants
 from config import DB_DIR
 from app.models import db, Project, Description
 from app.api import api_blueprint
@@ -8,6 +9,13 @@ from app.routes import frontend_blueprint
 from app.loader import data_importer, data_importer_json
 
 from app.setup import setup_logging
+
+
+def check_configuration():
+    logfile = os.path.abspath(constants.LOG_FILE)
+    if not os.path.isdir(os.path.dirname(logfile)):
+        raise Exception('Could not create log file. '
+                        'Directory does not exist:', os.path.dirname(logfile))
 
 
 def create_app():
@@ -22,6 +30,7 @@ def create_app():
     return app
 
 
+check_configuration()
 app = create_app()
 
 

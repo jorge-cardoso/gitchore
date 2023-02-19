@@ -16,7 +16,7 @@ const overview_fields = ["Project name", "Stakeholders", "Team",
 const description_fields = ["Goal", "Background", "Problem", "Approach", "Results", "KPI"]
 
 
-function getRows(data, mandatory_keys) {
+function getSingleValueRows(data, mandatory_keys) {
 
     if (mandatory_keys == null) {
         mandatory_keys = Object.keys(data);
@@ -27,6 +27,30 @@ function getRows(data, mandatory_keys) {
         key_name = mandatory_keys[key]
         if (!( key_name in data )) {
             row = `<tr> <td><b> ${key_name} </b></td> <td><p style="color:red;">Key not available</p></td> </tr>`;
+        }
+        else {
+            row = `<tr><td><b> ${key_name} </b></td> <td> ${data[key_name]} </td></tr>`;
+        }
+        rows.push(row);
+    }
+    return rows.join('');
+}
+
+function getTableRows(data, mandatory_keys) {
+
+    if (mandatory_keys == null) {
+        mandatory_keys = Object.keys(data);
+    }
+
+    var rows = [];
+    for (const key in mandatory_keys) {
+        key_name = mandatory_keys[key]
+        if (!( key_name in data )) {
+            row = `<tr> <td><b> ${key_name} </b></td> <td><p style="color:red;">Key not available</p></td> </tr>`;
+        }
+        else if ( ! (Array.isArray(data[key_name]))){
+            // if it is not an array, it must be KEY: VALUE
+            row = `<tr><td><b> ${key_name} </b></td> <td> ${data[key_name]} </td></tr>`;
         }
         else if (data[key_name].length == 1) {
             row = `<tr><td><b> ${key_name} </b></td> <td> ${data[key_name]} </td></tr>`;
@@ -45,9 +69,8 @@ function getRows(data, mandatory_keys) {
     return rows.join('');
 }
 
-
-function createTable(data, json_key, element_key, mandatory_keys) {
-  const rows = getRows(data[json_key], mandatory_keys);
+function createMultiValuesTable(data, json_key, element_key, mandatory_keys) {
+  const rows = getTableRows(data[json_key], mandatory_keys);
   const html = `
     <table class="table table-striped">
       <tbody>
@@ -120,11 +143,12 @@ function drawTables(url_id) {
         })
         .then(response => response.json())
         .then(function (data) {
-            createTable(data, 'Overview', 'project_overview', overview_fields);
-            createTable(data, 'Description', 'project_description', description_fields);
+            createMultiValuesTable(data, 'Overview', 'project_overview', overview_fields);
+            createMultiValuesTable(data, 'Description', 'project_description', description_fields);
+            createMultiValuesTable(data, 'Milestones', 'project_milestones', null);
             drawTaskTable(data['Tasks'], 'project_tasks');
             drawSprintTable(data, 'project_sprints');
-            createTable(data, 'Results', 'project_results', null);
+            createMultiValuesTable(data, 'Results', 'project_results', null);
             drawCharts(data);
         })
         .catch(function (err) {

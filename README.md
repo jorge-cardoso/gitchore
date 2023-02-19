@@ -1,4 +1,10 @@
 # Next Steps
++ Define a language for the description
+  + dates, date ranges, metada, headers, list: see https://github.com/hotoo/markline
++ Implement the notion of timeline
+  + https://matplotlib.org/stable/gallery/lines_bars_and_markers/timeline.html
+  + https://medium.com/unfound-news/auto-timeline-generate-a-high-quality-timeline-of-any-topic-using-machine-learning-269224878eb9
+  + https://github.com/jasonreisman/Timeline
 + Write full project description example
 + Implement schema on the client side
 + Test if md files can be retrieved from other CVS
@@ -56,6 +62,11 @@ $ export FLASK_APP=run.py
 $ export FLASK_ENV=development
 $ export FLASK_DEBUG=1  
 ```
+
+**Directories**
+
+- log to keep the logs
+- instance to keep the database 
 
 **Sample Data**
 

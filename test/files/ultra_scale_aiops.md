@@ -49,8 +49,8 @@
 
 # Milestones
 
-+ $01.01.2023, EDCP, mid-review 
-+ $12.01.2023, TDCP, final review
++ $01.01.2023: EDCP, mid-review 
++ $12.01.2023: TDCP, final review
 
 
 # Tasks

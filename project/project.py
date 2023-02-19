@@ -14,6 +14,7 @@ class Project:
         p = dict()
         p.update(self.overview())
         p.update(self.description())
+        p.update(self.milestones())
         p.update(self.tasks())
         p.update(self.sprints())
         p.update(self.results())
@@ -41,6 +42,15 @@ class Project:
             logger.warning('Unable to find section: Description')
         else:
             d['Description'] = self.parser.get_key_values(section[-1])
+        return d
+
+    def milestones(self):
+        d = dict()
+        section = self.parser.get_element('h1', startswith='Milestones')
+        if not section:
+            logger.warning('Unable to find section: Milestones')
+        else:
+            d['Milestones'] = self.parser.get_key_value(section[-1])
         return d
 
     def tasks(self):

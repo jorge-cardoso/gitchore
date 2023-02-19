@@ -38,6 +38,9 @@ const url_id = {{ url_id|tojson|safe }}
             <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-description"
                     type="button" role="tab" aria-controls="nav-description" aria-selected="false"> Description
             </button>
+            <button class="nav-link" id="nav-milestones-tab" data-bs-toggle="tab" data-bs-target="#nav-milestones"
+                    type="button" role="tab" aria-controls="nav-milestones" aria-selected="false"> Milestones
+            </button>
             <button class="nav-link" id="nav-tasks-tab" data-bs-toggle="tab" data-bs-target="#nav-tasks"
                     type="button" role="tab" aria-controls="nav-tasks" aria-selected="false"> Tasks
             </button>
@@ -45,7 +48,7 @@ const url_id = {{ url_id|tojson|safe }}
                     type="button" role="tab" aria-controls="nav-sprints" aria-selected="false"> Sprints
             </button>
             <button class="nav-link" id="nav-results-tab" data-bs-toggle="tab" data-bs-target="#nav-results"
-                    type="button" role="tab" aria-controls="nav-sprints" aria-selected="false"> Results
+                    type="button" role="tab" aria-controls="nav-results" aria-selected="false"> Results
             </button>
         </div>
     </nav>
@@ -66,6 +69,16 @@ const url_id = {{ url_id|tojson|safe }}
                 <h2 class="mt-4"> Description </h2>
                 <div class="col-12">
                     <div id="project_description" style="min-height: 400px; width:100%;"></div>
+                </div>
+            </div>
+
+        </div>
+        <div class="tab-pane fade" id="nav-milestones" role="tabpanel" aria-labelledby="nav-milestones-tab">
+
+            <div class="row justify-content-start">
+                <h2 class="mt-4"> Milestones </h2>
+                <div class="col-12">
+                    <div id="project_milestones" style="min-height: 400px; width:100%;"></div>
                 </div>
             </div>
 
