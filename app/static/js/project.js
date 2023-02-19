@@ -87,13 +87,13 @@ function drawSprintTable(data, element_key) {
         return b[3] > a[3];
     });
 
-    console.log(sprints);
+//    console.log(sprints);
 
     var table = ['<table class="table table-striped"><tbody>'];
     table.push('<tr><th>Task</th><th>Phase</th><th>User</th><th>Start</th><th>End</th><th>Description</th></tr>');
     for (const sprint of Object.entries(sprints)) {
 
-        console.log('sprint: ' + sprint);
+//        console.log('sprint: ' + sprint);
 
         s = sprint[1]
         table.push('<tr>');
@@ -208,7 +208,7 @@ function parseSprints(data, tasks) {
             end = moment(date, "DD.MM.YYYY").add(7, 'days').toDate();
 
             status = status_and_risks['status'][idx];
-            console.log(status);
+//            console.log(status);
 
             [task_name, users, progress, description] = parseTask(status);
             if (!( task_name in tasks )) {
@@ -298,4 +298,3 @@ function drawCharts(data) {
     var chart = new google.visualization.Gantt(document.getElementById('chart_gantt'));
     chart.draw(table, options);
 }
-

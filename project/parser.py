@@ -1,8 +1,11 @@
+import logging
 from io import StringIO
 import re
 
 import mistletoe
 from bs4 import BeautifulSoup, Tag
+
+logger = logging.getLogger(__name__)
 
 # https://extensions.xwiki.org/xwiki/bin/view/Extension/MarkdownSyntax/Markdown%20Syntax%201.2
 
@@ -42,7 +45,7 @@ class Parser:
         d = {}
         next_node = header.find_next('li')
         if not next_node:
-            print(f'Unable to find <li> after header: {header}')
+            logger.warning('Unable to find <li> after header: %s', header)
             return
         while True:
             if isinstance(next_node, Tag):
@@ -58,7 +61,7 @@ class Parser:
         d = {}
         sprints = section.find_next_sibling('ul')
         if not sprints:
-            print('Unable to find sprint sections')
+            logger.warning('Unable to find sprint sections')
             return d
 
         sprints = sprints.find_all('p', text=re.compile('\\$'))
@@ -72,7 +75,7 @@ class Parser:
             d = {}
             status = status_rec.find_next('em', text=name)
             if not status:
-                print(name, 'not found')
+                logger.warning('Not found: %s', name)
             else:
                 status = status.find_next('ul')
                 for i in get_tags(status):
@@ -86,10 +89,11 @@ class Parser:
         d[spring_date] = {}
         status_rec = get_tags(siblings)
         if not status_rec:
-            print('Unable to find sprint record')
+            logger.warning('Unable to find sprint record')
             return
         if len(status_rec) > 1:
             print('Too many sprint records. Selecting first one')
+            logger.warning('Too many sprint records. Selecting first one')
         status_rec = status_rec[0]
 
         d[spring_date].update(get_element('Status'))

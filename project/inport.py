@@ -1,3 +1,4 @@
+import logging
 from project.parser import Parser
 
 PROJECT_KEYS = ['Overview', 'Description', 'Tasks', 'Sprints', 'Results']

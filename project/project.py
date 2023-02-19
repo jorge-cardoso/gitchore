@@ -1,6 +1,9 @@
+import logging
 import json
 
 from project.parser import Parser
+
+logger = logging.getLogger(__name__)
 
 
 class Project:
@@ -26,7 +29,7 @@ class Project:
         d = dict()
         section = self.parser.get_element('h1', startswith='Overview')
         if not section:
-            print('Unable to find section:', 'Overview')
+            logger.warning('Unable to find section: Overview')
         else:
             d['Overview'] = self.parser.get_key_values(section[-1])
         return d
@@ -35,25 +38,25 @@ class Project:
         d = dict()
         section = self.parser.get_element('h1', startswith='Description')
         if not section:
-            print('Unable to find section:', 'Description')
+            logger.warning('Unable to find section: Description')
         else:
             d['Description'] = self.parser.get_key_values(section[-1])
         return d
 
     def tasks(self):
         d = dict()
-        section = self.parser.get_element('h2', startswith='Tasks')
+        section = self.parser.get_element('h1', startswith='Tasks')
         if not section:
-            print('Unable to find section:', 'Tasks')
+            logger.warning('Unable to find section: Tasks')
         else:
             d['Tasks'] = self.parser.get_key_value(section[-1])
         return d
 
     def sprints(self):
         d = dict()
-        section = self.parser.get_element('h2', startswith='Sprints')
+        section = self.parser.get_element('h1', startswith='Sprints')
         if not section:
-            print('Unable to find section:', 'Sprints')
+            logger.warning('Unable to find section: Sprints')
         else:
             d['Sprints'] = self.parser.get_sprints(section[-1])
         return d
@@ -62,22 +65,7 @@ class Project:
         d = dict()
         section = self.parser.get_element('h1', startswith='Results')
         if not section:
-            print('Unable to find section:', 'Results')
+            logger.warning('Unable to find section: Results')
         else:
             d['Results'] = self.parser.get_key_values(section[-1])
         return d
-
-
-if __name__ == '__main__':
-    p = Project(filename='samples/ultra_scale_aiops.md')
-
-    project = p.get_html()
-    print(json.dumps(project, indent=2))
-    with open('samples/ultra_scale_aiops.html', 'w') as f:
-        f.write(project)
-
-    project = p.get_dict()
-    print(json.dumps(project, indent=2))
-    with open('samples/ultra_scale_aiops.json', 'w') as f:
-        json.dump(project, f)
-

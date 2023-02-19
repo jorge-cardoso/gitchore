@@ -47,4 +47,3 @@ def initialize_database():
 
 
 db.init_app(app)
-

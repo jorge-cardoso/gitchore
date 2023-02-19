@@ -1,5 +1,5 @@
 {
    "LOG_STDERR": true,
-   "LOG_FILE": "gitchore.log",
+   "LOG_FILE": "log/gitchore.log",
    "DATE_FORMAT": "%Y-%m-%d"
 }

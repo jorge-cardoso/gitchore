@@ -47,20 +47,13 @@
 	+ Reduction on 5% of HUAWEI CLOUD failures impacting colleagues  
 
 
-# Execution
-## Milestones
+# Milestones
 
-+ M1: First PoC / Requirements / Developments / Go Live
-	+ Date: `15.03.2023`
-	+ Description
-		+ Integration technology with RoboArtisan service as a Skill App
-		+ End-to-end demo of robot following a group of similar persons
-		+ KPI dashboard with FPS, qps, etc. for Adaptive Cloud-Edge Scheduling
-	+ Status: Done
-	+ Deliverables
-		+ D1
++ $01.01.2023, EDCP, mid-review 
++ $12.01.2023, TDCP, final review
 
-## Tasks
+
+# Tasks
 
 + &Literature_Review: [&Research] Review literature of log management systems
 + &Competitor_analysis: [&Research] Analyse commercial log management systems
@@ -72,8 +65,8 @@
 + &Production: [&Production] Move system to CLS to production region
 + &Evaluation: [&Evaluation] Prepare final report
 
-## Sprints
-### $Jan 2023
+# Sprints
+## $Jan 2023
 
 + $23.01.2023
     + *Status*
@@ -88,5 +81,4 @@
        + [&Demo, @j00760260, %90] PoC showing observability analytics
    + *Risks* 
        + No risk
-
 

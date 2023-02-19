@@ -97,7 +97,7 @@ class Downloader:
                     f.write(content)
                     return True
                 except (IOError, OSError):
-                    logging.debug('Error writing to file: %s', file_name)
+                    logging.warning('Error writing to file: %s', file_name)
         except (FileNotFoundError, PermissionError, OSError):
-            logging.debug('Error opening file: %s', file_name)
+            logging.warning('Error opening file: %s', file_name)
         return False
