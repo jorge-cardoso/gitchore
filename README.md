@@ -28,12 +28,59 @@ Tech. Stack
 
 ## PM Flavored Markdown
 
-You can use PM Flavored Markdown for:
++ for an example, see  https://docs.gauge.org/writing-specifications.html?os=linux&language=javascript&ide=vscode
+
+### Sections
+A project description consists of different sections;
+some of which are mandatory and few are optional.
+
+The sections of a PM Flavored Markdown are as follows:
 + Overview
 + Description
 + Tasks
 + Sprints
 + Results
+
+Section headings are written in the <h1> Markdown syntax in 
+one of the following ways:
+
+#### Example
+
+In the following example, # Overview is the section heading,
+followed by tags and steps (statements preceded by *).
+
+> # Overview
+
+#### Overview
+
+#### Description
+
+#### Tasks
+
+Tasks are the executable components of a project that are written 
+by using the Markdown unordered list syntax.
+
+
+#### Sprints
+
+#### Results
+
+### Dates
+
+Parameters are used as placeholders instead of actual values.
+These parameters are used when referring to a table column value of a
+data table. Data tables are defined at the beginning of a spec.
+Parameters are also used as values in a Concept.
+Parameters have the following syntax: <param>.
+
+> Login as user <username> and "password"
+
+### Tags
+
+> Verify email text is <tag:research>
+ 
+### Phases
+
 
 
 ## How to use it
