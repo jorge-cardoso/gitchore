@@ -2,15 +2,15 @@ import unittest
 import os
 import json
 
-from project.project import Project
+from project.html_parser import HTMLParser
 
 
-class ProjectTest(unittest.TestCase):
+class TestHTMLParser(unittest.TestCase):
 
     def setUp(self):
         self.module_dir = os.path.realpath(os.path.dirname(__file__))
         filename = os.path.join(self.module_dir, 'files', 'ultra_scale_aiops.md')
-        self.project = Project(filename=filename)
+        self.project = HTMLParser(filename=filename)
 
     def test_get_html(self):
         html = self.project.get_html()

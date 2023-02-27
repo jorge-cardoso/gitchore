@@ -1,101 +1,73 @@
 import logging
-from io import StringIO
-import re
-
-import mistletoe
-from bs4 import BeautifulSoup, Tag
+from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
-# https://extensions.xwiki.org/xwiki/bin/view/Extension/MarkdownSyntax/Markdown%20Syntax%201.2
+
+class Parser(ABC):
+    """
+    The Parser interface declares operations common to all supported parsers for projects.
+    """
+
+    @abstractmethod
+    def get_dict(self) -> dict:
+        raise NotImplementedError('Methods was not implemented')
+
+    def name(self) -> str:
+        raise NotImplementedError('Methods was not implemented')
+
+    def overview(self) -> dict:
+        raise NotImplementedError('Methods was not implemented')
+
+    def description(self) -> dict:
+        raise NotImplementedError('Methods was not implemented')
+
+    def milestones(self) -> dict:
+        raise NotImplementedError('Methods was not implemented')
+
+    def tasks(self) -> dict:
+        raise NotImplementedError('Methods was not implemented')
+
+    def sprints(self) -> dict:
+        raise NotImplementedError('Methods was not implemented')
+
+    def results(self) -> dict:
+        raise NotImplementedError('Methods was not implemented')
 
 
-def get_tags(element):
-    return [i for i in element if isinstance(i, Tag)]
+class Context:
+    """
+    The Context defines the interface of interest to clients.
+    """
 
+    def __init__(self, parser: Parser) -> None:
+        """
+        Context accepts a parser through the constructor
+        """
 
-class Parser:
-    def __init__(self, content=None, filename=None):
-        if content:
-            html = mistletoe.markdown(StringIO(content))
-        else:
-            with open(filename, 'r') as fin:
-                html = mistletoe.markdown(fin)
+        self._parser = parser
 
-        self.html = html
-        self.page = BeautifulSoup(self.html, "html.parser")
+    @property
+    def parser(self) -> Parser:
+        """
+        The Context maintains a reference to one of the Parser objects. The
+        Context does not know the concrete class of a parser. It should work
+        with all strategies via the Parser interface.
+        """
 
-    def get_html(self):
-        return self.html
+        return self._parser
 
-    def get_element(self, element, startswith):
-        return self.page.find_all(element, text=re.compile(startswith))
+    @parser.setter
+    def parser(self, parser: Parser) -> None:
+        """
+        The Context allows replacing a Parser object at runtime.
+        """
 
-    def get_key_value(self, header):
-        d = {}
-        lu = header.find_next('ul')
-        for kv in get_tags(lu):
-            tokens = kv.text.split(':')
-            # todo(jc): if there is more than one symbol ':', we have a bug
-            key, value = tokens[0].strip(), tokens[1].strip()
-            d[key] = value
-        return d
+        self._parser = parser
 
-    def get_key_values(self, header):
-        d = {}
-        next_node = header.find_next('li')
-        if not next_node:
-            logger.warning('Unable to find <li> after header: %s', header)
-            return
-        while True:
-            if isinstance(next_node, Tag):
-                key = next_node.next_element.text.strip()
-                values = [value.text.strip() for value in next_node.find_all('li')]
-                d[key] = values
-            next_node = next_node.find_next_sibling('li')
-            if next_node is None:
-                break
-        return d
+    def __getattr__(self, attr):
+        """
+        The Context delegates functions executions to the implementions available
+        """
+        return getattr(self._parser, attr)
 
-    def get_sprints(self, section):
-        d = {}
-        sprints = section.find_next_sibling('ul')
-        if not sprints:
-            logger.warning('Unable to find sprint sections')
-            return d
-
-        sprints = sprints.find_all('p', text=re.compile('\\$'))
-        for sprint in sprints:
-            d.update(self.iterate_sprint(sprint))
-        return d
-
-    def iterate_sprint(self, header):
-
-        def get_element(name):
-            d = {}
-            status = status_rec.find_next('em', text=name)
-            if not status:
-                logger.warning('Not found: %s', name)
-            else:
-                status = status.find_next('ul')
-                for i in get_tags(status):
-                    d.setdefault(name.lower(), []).append(i.text)
-            return d
-
-        d = dict()
-
-        siblings = header.next_siblings
-        spring_date = header.text
-        d[spring_date] = {}
-        status_rec = get_tags(siblings)
-        if not status_rec:
-            logger.warning('Unable to find sprint record')
-            return
-        if len(status_rec) > 1:
-            print('Too many sprint records. Selecting first one')
-            logger.warning('Too many sprint records. Selecting first one')
-        status_rec = status_rec[0]
-
-        d[spring_date].update(get_element('Status'))
-        d[spring_date].update(get_element('Risks'))
-        return d

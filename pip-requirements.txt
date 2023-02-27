@@ -11,3 +11,7 @@ flask>=2.2.2
 flask-restx
 Flask-SQLAlchemy
 concurrent-log-handler
+
+mypy                        # yamldown
+nose2                       # yamldown
+pyyaml                      # yamldown
