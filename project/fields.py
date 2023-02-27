@@ -11,6 +11,12 @@ FIELDS: Dict[str, Dict] = {
         "start_symbol": "[",
         "regex": r'\[.*?\]',
         "desc": 'parse string with brackets'
+    },
+    "Name": {
+        "name": "User name",
+        "start_symbol": "",
+        "regex": r'(.+\@.+)',
+        "desc": 'parse string with brackets'
     }
 }
 
