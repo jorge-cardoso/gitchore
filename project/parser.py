@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 class Parser(ABC):
     """
     The Parser interface declares operations common to all supported parsers for projects.
+    Follows the Strategy Pattern
     """
 
     @abstractmethod

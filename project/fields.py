@@ -9,14 +9,38 @@ FIELDS: Dict[str, Dict] = {
     "Date": {
         "name": "date",
         "start_symbol": "[",
-        "regex": r'\[.*?\]',
-        "desc": 'parse string with brackets'
+        "regex": r'(\d{1,2})\.(\d{2})\.(\d{4})',
+        "example": '28.02.2023'
     },
-    "Name": {
+    "User_name": {
         "name": "User name",
         "start_symbol": "",
-        "regex": r'(.+\@.+)',
-        "desc": 'parse string with brackets'
+        "regex": r'\s*([a-zA-Z\s]*\w)\s*(@[\w]+)\s*',
+        "example": ' Jorge Cardoso @j00760260 '
+    },
+    "Status": {
+        "name": "Task status",
+        "start_symbol": "",
+        "regex": r'\(\s*(__[a-zA-Z]+__)\s*,\s*([a-zA-Z\s]*\w)\s*(@[\w]+)\s*,\s*(\d+%)\s*\)',
+        "example": '(__Design__, Jorge Cardoso @j00760260, 75% )'
+    },
+    "Task_description": {
+        "name": "Task description",
+        "start_symbol": "",
+        "regex": r'\(\s*(_[\w\s]+_)\)\s*([a-zA-Z\s]*\w)',
+        "example": '(_Research_) Review literature of log management systems'
+    },
+    "Task_name": {
+        "name": "Task name",
+        "start_symbol": "",
+        "regex": r'(__[\w\s]+__)',
+        "example": ' (__System Design__) '
+    },
+    "Milestone": {
+        "name": "Milestone",
+        "start_symbol": "",
+        "regex": r'\s*([\w\s]+):\s*(\d{1,2}\.\d{2}\.\d{4})\W*(.*\w)',
+        "example": '    M1: 01.01.2023, EDCP, mid-review    '
     }
 }
 

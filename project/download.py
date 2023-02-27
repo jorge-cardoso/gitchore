@@ -6,7 +6,7 @@ import json
 
 import requests
 
-from project import project
+from project.yaml_parser import YAMLParser
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class Downloader:
         if not self.content:
             self.get_content()
 
-        proj = project.Project(content=self.content.decode())
+        proj = YAMLParser(stream=self.content.decode())
         self.project = proj.get_dict()
         return self.project
 

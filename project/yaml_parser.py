@@ -14,8 +14,8 @@ class YAMLParser(Parser):
     """
     YAML Parser for projects.
     """
-    def __init__(self, file_descriptor):
-        self.yml_dct, _ = load(file_descriptor)
+    def __init__(self, stream):
+        self.yml_dct, _ = load(stream)
 
     def get_dict(self) -> dict:
         return self.yml_dct
