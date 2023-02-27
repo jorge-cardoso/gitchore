@@ -1,5 +1,5 @@
 import logging
-from project.parser import Parser
+from project.parser_html import Parser
 
 PROJECT_KEYS = ['Overview', 'Description', 'Tasks', 'Sprints', 'Results']
 

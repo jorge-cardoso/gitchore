@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from project import parser
+from project import parser_html
 
 
 class ParserTest(unittest.TestCase):

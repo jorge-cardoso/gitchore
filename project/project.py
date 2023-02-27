@@ -1,7 +1,7 @@
 import logging
 import json
 
-from project.parser import Parser
+from project.parser_html import Parser
 
 logger = logging.getLogger(__name__)
 
