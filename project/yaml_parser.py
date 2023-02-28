@@ -31,15 +31,20 @@ class YAMLParser(Parser):
         return dict(ChainMap(*self.yml_dct['Description']))
 
     def milestones(self) -> dict:
+        # Todo(jc): parse and extend milestones
         return dict(ChainMap(*self.yml_dct['Milestones']))
 
     def tasks(self) -> dict:
+        # Todo(jc): parse and extend Tasks
         return dict(ChainMap(*self.yml_dct['Tasks']))
 
     def sprints(self) -> dict:
+        # Todo(jc): parse and extend Sprints
         return dict(ChainMap(*self.yml_dct['Sprints']))
 
     def results(self) -> dict:
+        # Todo(jc): parse and extend Results
+        # Todo(jc): compare results with KPIs
         return dict(ChainMap(*self.yml_dct['Results']))
 
 
