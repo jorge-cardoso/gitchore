@@ -46,10 +46,10 @@ class YAMLParser(Parser):
 class Buffer(object):
 
     def __init__(self) -> None:
-        self.contents = ""
+        self.contents = ''
 
     def append(self, contents: str) -> None:
-        self.contents = "{existing}{end}".format(existing=self.contents, end=contents)
+        self.contents = f'{self.contents}{contents}'
 
     def empty(self) -> bool:
         return len(self.contents) == 0
@@ -76,15 +76,15 @@ def load(stream: IO[str]) -> Tuple[Dict, str]:
         current_buffer.append(line)
 
     yml_dict = yaml.load(yml_contents.contents, Loader=yaml.FullLoader)
-    return yml_dict, md_contents.contents.strip("\n")
+    return yml_dict, md_contents.contents.strip('\n')
 
 
 def _is_yaml_start(line: str, reading_yml: bool) -> bool:
-    return line.strip("\n").endswith("---") and not reading_yml
+    return line.strip('\n').endswith('---') and not reading_yml
 
 
 def _is_yaml_end(line: str, reading_yml: bool) -> bool:
-    return line.strip("\n").endswith("---") and reading_yml
+    return line.strip('\n').endswith('---') and reading_yml
 
 
 def dump(yml: Dict, markdown: str, yaml_first=True) -> str:
@@ -92,6 +92,6 @@ def dump(yml: Dict, markdown: str, yaml_first=True) -> str:
     yaml_out = yaml.dump(yml, default_flow_style=False, indent=2)
 
     if yaml_first:
-        return "---\n{yml}\n---\n{markdown}".format(yml=yaml_out, markdown=markdown)
+        return f'---\n{yaml_out}\n---\n{markdown}'
 
-    return "{markdown}\n---\n{yml}\n---".format(markdown=markdown, yml=yaml_out)
+    return f'{markdown}\n---\n{yaml_out}\n---'
