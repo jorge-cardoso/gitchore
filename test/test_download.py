@@ -16,12 +16,13 @@ class DownloaderTest(unittest.TestCase):
     def tearDown(self):
         self.tmp_dir.cleanup()
 
-    def test_get_element(self):
-        self.assertTrue(isinstance(self.dl.project_name(), str))
-        self.assertEqual(self.dl.project_name(), 'AI for Project Management')
+    def test_download(self):
+        self.assertTrue(isinstance(self.dl.download().get_dict(), dict))
 
-    def test_get_project(self):
-        self.assertTrue(isinstance(self.dl.get_project(), dict))
+    def test_project_name(self):
+        project = self.dl.download()
+        self.assertTrue(isinstance(project.name(), str))
+        self.assertEqual(project.name(), 'AI for Project Management')
 
     def test_save(self):
         self.files_created = self.dl.save()

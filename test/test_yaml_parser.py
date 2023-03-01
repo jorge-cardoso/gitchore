@@ -115,9 +115,10 @@ class TestYAMLParser(unittest.TestCase):
         self.assertEqual(md_contents, expected_md)
 
     def test_load_file(self):
-        with open("./files/ultra_scale_aiops_yml_md.md", "r") as f:
+        with open("./files/ultra_scale_aiops.md", "r") as f:
             project = yaml_parser.YAMLParser(f)
-            print(project.overview())
+            print(project.milestones())
+            print(project.tasks())
 
 
 class TestDump(unittest.TestCase):

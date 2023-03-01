@@ -48,8 +48,8 @@ class Downloader:
     def __init__(self, url, local_dir):
         self.url = url
         self.local_dir = local_dir
-        self.content = None
-        self.project = {}
+        self.resp = None
+        self.project = None
 
     def is_url_valid(self) -> dict:
         try:
@@ -61,30 +61,24 @@ class Downloader:
         except ValueError:
             return {}
 
-    def get_content(self):
-        req = requests.get(self.url, allow_redirects=True, verify=False)
-        self.content = req.content
-        return self.content
-
-    def get_project(self):
-        if not self.content:
-            self.get_content()
-
-        proj = YAMLParser(stream=self.content.decode())
-        self.project = proj.get_dict()
+    def download(self):
+        self.resp = requests.get(self.url, allow_redirects=True, verify=False)
+        self.project = \
+            YAMLParser(stream=self.resp.iter_lines(decode_unicode=True))
         return self.project
 
-    def project_name(self):
-        if not self.project:
-            self.get_project()
-        return self.project['Overview']['Project name'][0]
-
     def save(self):
-        md_file = os.path.join(self.local_dir, slugify(self.project_name()) + '.md')
-        json_file = os.path.join(self.local_dir, slugify(self.project_name()) + '.json')
+        if not self.project:
+            self.download()
 
-        if (self._save_helper(md_file, self.content.decode()) and
-                self._save_helper(json_file, json.dumps(self.project, indent=4))):
+        project_name = slugify(self.project.name())
+        md_file = os.path.join(self.local_dir, project_name + '.md')
+        json_file = os.path.join(self.local_dir, project_name + '.json')
+
+        if (self._save_helper(md_file, self.resp.content.decode()) and
+                self._save_helper(json_file,
+                                  json.dumps(self.project.get_dict(),
+                                             indent=4))):
             return [md_file, json_file]
 
         return []

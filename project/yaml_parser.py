@@ -5,9 +5,11 @@ Adapted from
 from typing import IO, Tuple, Dict
 from collections import ChainMap
 from functools import lru_cache
+import re
 import yaml
 
 from project.parser import Parser
+from project.fields import FIELDS
 
 
 class YAMLParser(Parser):
@@ -31,12 +33,32 @@ class YAMLParser(Parser):
         return dict(ChainMap(*self.yml_dct['Description']))
 
     def milestones(self) -> dict:
-        # Todo(jc): parse and extend milestones
-        return dict(ChainMap(*self.yml_dct['Milestones']))
+        m = {}
+        for dct in self.yml_dct['Milestones']:
+            if not dct:
+                continue
+            key, value = list(dct.items())[0]
+            match = re.search(FIELDS['Milestones']['regex'], value)
+            if not match:
+                continue
+            date, description = match.groups()
+            m.update({key: {'date': date, 'description': description}})
+
+        return m
 
     def tasks(self) -> dict:
-        # Todo(jc): parse and extend Tasks
-        return dict(ChainMap(*self.yml_dct['Tasks']))
+        m = {}
+        for dct in self.yml_dct['Tasks']:
+            if not dct:
+                continue
+            key, value = list(dct.items())[0]
+            match = re.search(FIELDS['Tasks']['regex'], value)
+            if not match:
+                continue
+            date, description = match.groups()
+            m.update({key: {'date': date, 'description': description}})
+
+        return m
 
     def sprints(self) -> dict:
         # Todo(jc): parse and extend Sprints
@@ -78,7 +100,7 @@ def load(stream: IO[str]) -> Tuple[Dict, str]:
             current_buffer = md_contents
             continue
 
-        current_buffer.append(line)
+        current_buffer.append(line + '\n')
 
     yml_dict = yaml.load(yml_contents.contents, Loader=yaml.FullLoader)
     return yml_dict, md_contents.contents.strip('\n')

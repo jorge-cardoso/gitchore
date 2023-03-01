@@ -30,13 +30,13 @@ FIELDS: Dict[str, Dict] = {
         "regex": r'\(\s*(_[\w\s]+_)\)\s*([a-zA-Z\s]*\w)',
         "example": '(_Research_) Review literature of log management systems'
     },
-    "Task_name": {
+    "Tasks": {
         "name": "Task name",
         "start_symbol": "",
         "regex": r'(__[\w\s]+__)',
         "example": ' (__System Design__) '
     },
-    "Milestone": {
+    "Milestones": {
         "name": "Milestone",
         "start_symbol": "",
         "regex": r'\s*([\w\s]+):\s*(\d{1,2}\.\d{2}\.\d{4})\W*(.*\w)',
