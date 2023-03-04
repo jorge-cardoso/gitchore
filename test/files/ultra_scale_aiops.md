@@ -13,8 +13,9 @@ Overview:
   - https://dropbox.com/b/52f3a0a66a90992b62d4aa643a74e2f1
 - Schedule: 15.03.2023 -- 15.03.2024
 - Deliverables:
-  - D1
-  - D2
+  - D1: Literature review 
+  - D2: System design
+  - D3: Python library 
 ---
 
 # Description
@@ -79,7 +80,7 @@ Sprints:
 - Jan 2023:
   - 23.01.2023:
       - Status:
-        - (__System_Design__, @j00760260, 75%) Design the system to be integrated into the CAD system
+        - (__System_Design__, Jorge @j00760260, 75%) Design the system to be integrated into the CAD system
         - (__Demo__, @j00760260, 90%) PoC showing observability analytics
       - Risks:
         - No risk
@@ -89,5 +90,20 @@ Sprints:
          - (__PoC__, @j00760260, 90%) PoC showing observability analytics
          - (__Demo__, @j00760260, 90%) PoC showing observability analytics
     - Risks: 
+        - No risk
+  
+  - 09.01.2023:
+    - Status:
+         - (__PoC__, @j00760260, 90%) PoC showing observability analytics
+         - (__Demo__, @j00760260, 90%) PoC showing observability analytics
+    - Risks: 
+        - No risk- 
+
+- Dec 2022:
+  - 12.12.2022:
+      - Status:
+        - (__System_Design__, Jorge @j12a12, 75%) Design the system to be integrated into the CAD system
+        - (__Demo__, @j12a12, 90%) PoC showing observability analytics
+      - Risks:
         - No risk
 ---

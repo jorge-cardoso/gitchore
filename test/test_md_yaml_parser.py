@@ -2,7 +2,7 @@ import unittest
 import io
 from typing import IO
 
-import project.yaml_parser as yaml_parser
+import project.md_yaml_parser as yaml_parser
 
 
 def yaml_first_yaml_parser() -> str:
@@ -115,10 +115,16 @@ class TestYAMLParser(unittest.TestCase):
         self.assertEqual(md_contents, expected_md)
 
     def test_load_file(self):
-        with open("./files/ultra_scale_aiops.md", "r") as f:
+        with open("./test/files/ultra_scale_aiops.md", "r") as f:
             project = yaml_parser.YAMLParser(f)
+            print(project.overview())
+            print(project.description())
             print(project.milestones())
             print(project.tasks())
+            print(project.sprints())
+            print(project.results())
+
+            print(project.get_dict())
 
 
 class TestDump(unittest.TestCase):

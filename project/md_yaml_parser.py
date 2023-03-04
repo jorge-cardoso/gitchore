@@ -20,17 +20,23 @@ class YAMLParser(Parser):
         self.yml_dct, _ = load(stream)
 
     def get_dict(self) -> dict:
-        return self.yml_dct
+        # return self.yml_dct
+        return self.overview() |\
+            self.description() |\
+            self.milestones() |\
+            self.tasks() |\
+            self.sprints() |\
+            self.results()
 
     @lru_cache(maxsize=1)
     def name(self) -> str:
         return self.overview()['Project name']
 
     def overview(self) -> dict:
-        return dict(ChainMap(*self.yml_dct['Overview']))
+        return {'Overview': dict(ChainMap(*self.yml_dct['Overview']))}
 
     def description(self) -> dict:
-        return dict(ChainMap(*self.yml_dct['Description']))
+        return {'Description': dict(ChainMap(*self.yml_dct['Description']))}
 
     def milestones(self) -> dict:
         m = {}
@@ -44,7 +50,7 @@ class YAMLParser(Parser):
             date, description = match.groups()
             m.update({key: {'date': date, 'description': description}})
 
-        return m
+        return {'Milestones': m}
 
     def tasks(self) -> dict:
         m = {}
@@ -52,22 +58,47 @@ class YAMLParser(Parser):
             if not dct:
                 continue
             key, value = list(dct.items())[0]
-            match = re.search(FIELDS['Tasks']['regex'], value)
+            match = re.search(FIELDS['Task_description']['regex'], value)
             if not match:
                 continue
             date, description = match.groups()
-            m.update({key: {'date': date, 'description': description}})
+            m.update({key: {'phase': date, 'description': description}})
 
-        return m
+        return {'Tasks': m}
 
     def sprints(self) -> dict:
-        # Todo(jc): parse and extend Sprints
-        return dict(ChainMap(*self.yml_dct['Sprints']))
+        m = []
+        for sub_sprint in self.yml_dct['Sprints']:
+            if not sub_sprint:
+                print('No sub_print:', sub_sprint)
+                continue
+            _, sprints = list(sub_sprint.items())[0]
+
+            for s in sprints:
+                date, value = list(s.items())[0]
+                tasks_status = value[0]['Status']
+                # parser risk -> function
+                risks = value[1]['Risks']
+                m1 = []
+                for sts in tasks_status:
+                    # parser task status -> function
+                    match = re.search(FIELDS['Status']['regex'], sts)
+                    if not match:
+                        print('No match:', sts)
+                        continue
+                    task, name, _id, perct = match.groups()
+                    m1.append({'task_name': task,
+                               'user_name': name.strip(),
+                               'user_id': _id,
+                               '%': perct
+                               })
+
+                m.append({date: {'Tasks': m1, 'Risks': risks}})
+
+        return {'Sprints': m}
 
     def results(self) -> dict:
-        # Todo(jc): parse and extend Results
-        # Todo(jc): compare results with KPIs
-        return dict(ChainMap(*self.yml_dct['Results']))
+        return {'Results': dict(ChainMap(*self.yml_dct['Results']))}
 
 
 class Buffer(object):
